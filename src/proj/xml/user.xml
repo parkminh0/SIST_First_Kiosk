@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+
+    <select id="login" parameterType="Map" resultType="proj.vo.UserVO">
+        SELECT * FROM user
+        WHERE u_id = #{key_id} AND u_pw = #{key_pw}
+    </select>
+    
+    <select id="search_uidx" parameterType="String" resultType="proj.vo.UserVO">
+        SELECT u_idx FROM user WHERE u_phone = #{phone}
+    </select>
+    
+    <select id="search_uidx_uid" parameterType="String" resultType="proj.vo.UserVO">
+        SELECT u_idx FROM user WHERE u_id = #{u_id}
+    </select>
+    <select id="select_by_phone" parameterType="String" resultType="proj.vo.UserVO">
+        SELECT *
+        FROM user
+        WHERE is_del = 0
+        <if test="phone != null">
+        AND u_phone LIKE CONCAT('%',#{phone},'%')
+        </if>
+    </select>
+    
+    <insert id="add_user" parameterType="Map">
+        INSERT
+        INTO user(u_phone)
+        VALUES(#{u_phone})
+    </insert>
+    
+    <update id="update_user" parameterType="Map">
+        UPDATE user
+        SET u_phone = #{u_phone}, upt_dtm = now()
+        WHERE u_idx = #{u_idx}
+    </update>
+    
+    <update id="delete_user" parameterType="String">
+        UPDATE user
+        SET is_del = 1, upt_dtm = now()
+        WHERE u_idx = #{u_idx}
+    </update>
+    
+    <!-- 1주년 쿠폰
+    select * from user
+where date_format(crt_dtm, '%Y-%m-%d') = date_sub(date_format(now(), '%Y-%m-%d'), INTERVAL 1 YEAR)
+    -->
+    
+</mapper>

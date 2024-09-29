@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="menu">
+  <select id="list" resultType="proj.vo.MenuVO">
+    select *
+    from menu
+    where is_del != 1
+  </select>
+
+  <select id="get_menu" parameterType="String" resultType="proj.vo.MenuVO">
+    select *
+    from menu
+    where m_idx = #{m_idx}
+  </select>
+  
+  <insert id="add_menu" parameterType="Map">
+      INSERT
+      INTO menu(m_name, category_idx, price, unit_price, brew_time, img_url, `desc`, stock)
+      VALUES (#{m_name}, #{category_idx}, #{price}, #{unit_price}, #{brew_time}, #{img_url}, #{desc},#{stock})
+  </insert>
+  
+  <update id="update_menu" parameterType="Map">
+      UPDATE menu
+      SET   m_name = #{m_name},
+            category_idx = #{category_idx},
+            price = #{price},
+            unit_price = #{unit_price},
+            brew_time = #{brew_time},
+            img_url = #{img_url},
+            `desc` = #{desc},
+            stock = #{stock},
+            upt_dtm = now()
+      WHERE m_idx = #{m_idx}
+  </update>
+  
+  <update id="delete_menu" parameterType="String">
+      UPDATE menu
+      SET is_del = 1, upt_dtm = now()
+      WHERE m_idx = #{m_idx}
+  </update>
+  
+  <update id="stockchange" parameterType="Map">
+      UPDATE menu
+      SET stock = stock - #{order_qty}
+      WHERE m_idx = #{m_idx}
+  </update>
+  
+  
+</mapper>

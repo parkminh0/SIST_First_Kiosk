@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="stock">
+	<select id="search" parameterType="Map" resultType="proj.vo.StockVO">
+		SELECT s.s_idx, m.m_name, s.pre_stock, s.add_stock, s.start_stock, s.end_stock, s.crt_dtm, c.cate_name
+		FROM stock s 
+		JOIN menu m ON s.m_idx = m.m_idx
+		JOIN category c ON m.category_idx = c.category_idx
+                
+		<choose>
+                    <!-- 추가 재고 수정 시 부르는 쿼리문 -->
+                    <when test="m_idx != '' and addStock != null">
+                        WHERE m.m_idx = #{m_idx} AND s.crt_dtm LIKE CONCAT(substring(date_sub(now(),INTERVAL 1 DAY),1,10),'%')
+                        <if test="category_idx != 0">
+                            AND c.category_idx = #{category_idx}
+                        </if>
+                    </when>
+                    <when test="m_name != '' and start_crt_dtm != '' and end_crt_dtm != ''">
+                        WHERE m.m_name LIKE CONCAT ('%', #{m_name}, '%') AND s.crt_dtm BETWEEN #{start_crt_dtm} AND #{end_crt_dtm}
+                        <if test="category_idx != 0">
+                            AND c.category_idx = #{category_idx}
+                        </if>
+                    </when>
+
+                    <when test="m_name != '' and start_crt_dtm == '' and end_crt_dtm == ''">
+                        WHERE m.m_name LIKE CONCAT ('%', #{m_name}, '%')
+                        <if test="category_idx != 0">
+                            AND c.category_idx = #{category_idx}
+                        </if>
+                    </when>
+                    <when test="m_name == '' and start_crt_dtm != '' and end_crt_dtm != ''">
+                        WHERE s.crt_dtm BETWEEN #{start_crt_dtm} AND #{end_crt_dtm}
+                        <if test="category_idx != 0">
+                            AND c.category_idx = #{category_idx}
+                        </if>
+                    </when>
+                    <when test="m_name == '' and start_crt_dtm == '' and end_crt_dtm == ''">
+                        <if test="category_idx != 0">
+                            WHERE c.category_idx = #{category_idx}
+                        </if>
+                    </when>
+		</choose>
+	</select>
+        
+        <select id="last_crtDtm" parameterType="String" resultType="String">
+            SELECT ifnull(max(crt_dtm), 'test')
+            FROM `stock`
+            WHERE m_idx = #{m_idx}
+        </select>
+        
+        <insert id="insert" parameterType="Map">
+            INSERT
+            INTO `stock`(m_idx, pre_stock, add_stock, start_stock, end_stock)
+            VALUES (#{m_idx}, #{pre_stock}, #{add_stock}, #{start_stock}, #{end_stock})
+        </insert>
+        
+        <update id="update" parameterType="Map">
+            UPDATE `stock`
+            SET add_stock = add_stock + #{add_stock}, start_stock = start_stock + #{add_stock}
+            WHERE m_idx = #{m_idx} AND crt_dtm = #{crt_dtm}
+        </update>
+        
+        <update id="end_stock" parameterType="Map">
+            UPDATE `stock`
+            SET end_stock = #{end_stock}
+            WHERE m_idx = #{m_idx} AND crt_dtm = #{crt_dtm}
+        </update>
+</mapper>

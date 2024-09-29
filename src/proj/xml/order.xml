@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="order">
+
+<resultMap type="proj.vo.OrderVO" id="m_bt">
+    <result property="m_idx" column="m_idx"/>
+    <association property="mvo" javaType="proj.vo.MenuVO" select="menu.get_menu" column="m_idx"/>
+</resultMap>
+    <select id="order_list" parameterType="String" resultMap="m_bt">
+        SELECT *
+        FROM `order`
+        WHERE ol_idx = #{ol_idx}
+    </select>
+    
+    <insert id="save" parameterType="proj.vo.OrderVO">
+    Insert INTO `order`(
+        m_idx,
+        ol_idx,
+        order_qty,
+        price
+    )
+    VALUES
+            (
+                #{m_idx},
+                #{ol_idx},
+                #{order_qty},
+                #{price}
+            )
+    </insert>
+</mapper>

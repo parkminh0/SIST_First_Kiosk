@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="orderlist">
+    <resultMap type="proj.vo.OrderListVO" id="m_bt">
+        <id property="ol_idx" column="ol_idx" />
+        <collection property="o_list" ofType="proj.vo.OrderVO" select="order.order_list" column="ol_idx"/>
+    </resultMap>
+
+    <select id="list" parameterType="String" resultMap="m_bt">
+        SELECT *
+          FROM orderlist
+         WHERE ol_idx = #{ol_idx}
+    </select>
+    
+    <select id="get_idx" resultType="int">
+        select max(ol_idx) as ol_idx 
+          from orderlist
+    </select>
+    
+    <insert id="make_orderlist" parameterType="proj.vo.OrderListVO" useGeneratedKeys="true" keyProperty="ol_idx">
+        Insert into orderlist
+            (u_idx,
+            total_cnt,
+            odr_price,
+            is_coupon,
+            dis_price,
+            total_price,
+            odr_date) 
+        values(
+            #{u_idx},
+            #{total_cnt},
+            #{odr_price},
+            #{is_coupon},
+            #{dis_price},
+            #{total_price},
+            now()
+        )
+    </insert>
+    
+    <select id="admin_search_orderlist" parameterType="Map" resultType="proj.vo.OrderListVO">
+        select ol.*, u.u_phone from orderlist ol
+        left join user u on u.u_idx = ol.u_idx
+        <choose>
+        	<when test="start_odr_date != '' and end_odr_date != ''">        		
+                    where ol.odr_date between #{start_odr_date} and #{end_odr_date}
+        	</when>
+        	<when test="start_odr_date == '' and end_odr_date != ''">
+                    where ol.odr_date <![CDATA[<=]]> #{end_odr_date}
+        	</when>
+        	<when test="start_odr_date != '' and end_odr_date == ''">
+                    where ol.odr_date <![CDATA[>=]]> #{start_odr_date}
+        	</when>
+        	<when test="start_odr_date == '' and end_odr_date ==''">
+        	</when>
+        </choose>
+    </select>
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="couponlist">
+    <resultMap type="proj.vo.CouponListVO" id="get_coupon">
+        <result property="coupon_idx" column="coupon_idx"/>
+        <association property="cvo" javaType="proj.vo.CouponVO" select="coupon.search_coupon" column="coupon_idx"/>
+    </resultMap>
+
+    <select id="search_couponList" parameterType="String" resultMap="get_coupon">
+        select * from couponlist where u_idx = #{u_idx} and coupon_qty > 0
+    </select>
+    
+    <select id="search_couponExist" parameterType="Map" resultType="int">
+        select count(*) from couponlist where u_idx = #{u_idx} and coupon_idx = #{coupon_idx}
+    </select>
+    
+    <select id="search_coupon_idx" parameterType="String" resultType="proj.vo.CouponListVO">
+        select coupon_idx from couponlist where u_idx = #{u_idx} and coupon_qty > 0
+    </select>
+
+    <update id="coupon_consume" parameterType="Map">
+        update couponlist
+        set coupon_qty = coupon_qty - 1
+        where coupon_idx = #{coupon_idx} and u_idx = #{u_idx};
+    </update>
+    
+    <!-- 가입축하쿠폰 -->
+    <insert id="new_user" parameterType="String"> 
+        INSERT INTO couponlist (
+          coupon_idx,
+          u_idx,
+          coupon_qty)
+        values (
+            1,
+            #{u_idx},
+            1
+        )
+    </insert>
+    
+    <!-- 일시지급쿠폰 -->
+    <insert id="imediate_coupon" parameterType="Map"> 
+        INSERT INTO couponlist (
+          coupon_idx,
+          u_idx,
+          coupon_qty)
+        values (
+            #{coupon_idx},
+            #{u_idx},
+            1
+        )
+    </insert>
+    <select id="select_year" parameterType="String" resultType="proj.vo.UserVO">
+        SELECT * FROM user
+         where date_format(crt_dtm, '%Y-%m-%d') <![CDATA[<=]]> date_add(date_format(now(), '%Y-%m-%d'), interval -#{cnt} year)
+    </select>
+    
+    <select id="select_month" parameterType="String" resultType="proj.vo.UserVO">
+        SELECT * FROM user
+         where date_format(crt_dtm, '%Y-%m-%d') <![CDATA[<=]]> date_add(date_format(now(), '%Y-%m-%d'), interval -#{cnt} month)
+    </select>
+
+    <select id="select_day" parameterType="String" resultType="proj.vo.UserVO">
+        SELECT * FROM user
+         where date_format(crt_dtm, '%Y-%m-%d') <![CDATA[<=]]> date_add(date_format(now(), '%Y-%m-%d'), interval -#{cnt} day)
+    </select>
+</mapper>

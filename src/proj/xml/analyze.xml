@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="analyze">
+	<select id="search_time" parameterType="Map" resultType="proj.vo.AnalyzeVO">
+            SELECT m.m_name, m.unit_price, sum(ifnull(o.order_qty, 0)) as order_qty, sum(ifnull(o.price, 0)) as price, sum(ifnull(m.unit_price, 0)) as unit_price,date_format(l.odr_date, "%Y-%m-%d %H") as odr_date
+            FROM orderlist l
+            JOIN `order` o ON o.ol_idx = l.ol_idx  
+            JOIN menu m ON m.m_idx = o.m_idx
+            <choose>
+                <when test="start_odr_date == '' and end_odr_date == ''">
+                </when>
+                <when test="start_odr_date != '' and end_odr_date != ''">
+                    where l.odr_date Between #{start_odr_date} and #{end_odr_date}
+                </when>
+                <when test="start_odr_date != '' and end_odr_date == ''">
+                    where l.odr_date <![CDATA[>=]]> #{start_odr_date}
+                </when>
+                <when test="start_odr_date == '' and end_odr_date != ''">
+                    where l.odr_date <![CDATA[<=]]> #{end_odr_date}
+                </when>
+            </choose>
+            group by m.m_name, m.unit_price, date_format(l.odr_date, "%Y-%m-%d %H")
+            having order_qty != 0
+        </select>
+        <select id="search_day" parameterType="Map" resultType="proj.vo.AnalyzeVO">
+            SELECT m.m_name, m.unit_price, sum(ifnull(o.order_qty, 0)) as order_qty, sum(ifnull(o.price, 0)) as price, sum(ifnull(m.unit_price, 0)) as unit_price,date_format(l.odr_date, "%Y-%m-%d") as odr_date
+            FROM orderlist l
+            JOIN `order` o ON o.ol_idx = l.ol_idx  
+            JOIN menu m ON m.m_idx = o.m_idx
+            <choose>
+                <when test="start_odr_date == '' and end_odr_date == ''">
+                </when>
+                <when test="start_odr_date != '' and end_odr_date != ''">
+                    where l.odr_date Between #{start_odr_date} and #{end_odr_date}
+                </when>
+                <when test="start_odr_date != '' and end_odr_date == ''">
+                    where l.odr_date <![CDATA[>=]]> #{start_odr_date}
+                </when>
+                <when test="start_odr_date == '' and end_odr_date != ''">
+                    where l.odr_date <![CDATA[<=]]> #{end_odr_date}
+                </when>
+            </choose>
+            group by m.m_name, m.unit_price, date_format(l.odr_date, "%Y-%m-%d")
+            having order_qty != 0
+        </select>
+        <select id="search_month" parameterType="Map" resultType="proj.vo.AnalyzeVO">
+            SELECT m.m_name, m.unit_price, sum(ifnull(o.order_qty, 0)) as order_qty, sum(ifnull(o.price, 0)) as price, date_format(l.odr_date, "%Y-%m") as odr_date
+            FROM orderlist l
+            JOIN `order` o ON o.ol_idx = l.ol_idx  
+            JOIN menu m ON m.m_idx = o.m_idx
+            <choose>
+                <when test="start_odr_date == '' and end_odr_date == ''">
+                </when>
+                <when test="start_odr_date != '' and end_odr_date != ''">
+                    where l.odr_date Between #{start_odr_date} and #{end_odr_date}
+                </when>
+                <when test="start_odr_date != '' and end_odr_date == ''">
+                    where l.odr_date <![CDATA[>=]]> #{start_odr_date}
+                </when>
+                <when test="start_odr_date == '' and end_odr_date != ''">
+                    where l.odr_date <![CDATA[<=]]> #{end_odr_date}
+                </when>
+            </choose>
+            group by m.m_name, m.unit_price, date_format(l.odr_date, "%Y-%m")
+            having order_qty != 0
+        </select>
+</mapper>

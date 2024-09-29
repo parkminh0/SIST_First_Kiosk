@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="coupon">
+<select id="search_coupon" parameterType="Integer" resultType="proj.vo.CouponVO">
+            SELECT * FROM `coupon`
+            WHERE coupon_idx = #{coupon_idx}
+</select>
+        
+        <select id="search_all" resultType="proj.vo.CouponVO">
+            SELECT * FROM `coupon`
+</select>
+        
+        <select id="search_max" resultType="String">
+            SELECT max(coupon_idx) from `coupon`
+        </select>
+        
+        <insert id="coupon_insert" parameterType="Map">
+            INSERT INTO `COUPON`
+            (coupon_name,
+             discount,
+             chkymd,
+             cntymd
+            )
+            VALUES(
+             #{coupon_name},
+             #{discount},
+             #{chkymd},
+             #{cntymd}
+            )
+        </insert>
+        
+        <update id="coupon_update" parameterType="Map">
+            UPDATE `COUPON`
+            SET coupon_name = #{coupon_name},
+                discount = #{discount},
+                chkymd = #{chkymd},
+                cntymd = #{cntymd}
+            WHERE coupon_idx = #{coupon_idx}
+        </update>
+        
+        <delete id="coupon_delete" parameterType="String">
+            DELETE FROM `COUPON`
+            WHERE coupon_idx = #{coupon_idx}
+        </delete>
+</mapper>
